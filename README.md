@@ -203,9 +203,12 @@ print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 - `merging_threshold` controls the frame rate: 0.91 gives ~8.3Hz, 0.86 gives ~6.25Hz
 
 ### Training reference implementations
+- For FlexiCodec: see https://github.com/jiaqili3/flexicodec_training_share
+- For FlexiCodec-TTS:
 Inside `flexicodec/ar_tts/modeling_artts.py` and `flexicodec/nar_tts/modeling_voicebox.py` there are `training_forward` methods that receive audios and prepared sensevoice-small input "FBank" features. (`dl_output` dictionary containing `x` (the [`feature_extractor`](flexicodec/infer.py#L50) output), `x_lens` (length of each x before padding), `audio` (the 16khz audio tensor)). 
 Training can be replicated by passing the same data to the `training_forward` methods. 
 
+If you need more code for training FlexiCodec-TTS, you can contact me or create an issue.
 
 
 ## Acknowledgements & Citation
