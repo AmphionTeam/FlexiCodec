@@ -3,7 +3,7 @@
 [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2510.00981)
 [![Demo Page](https://img.shields.io/badge/GitHub.io-Demo_Page-blue?logo=Github&style=flat-square)](https://flexicodec.github.io/)
 [![OpenReview](https://img.shields.io/badge/OpenReview-ICLR2026-red?logo=OpenReview&style=flat-square)](https://openreview.net/forum?id=kYkfCs4ZAH)
-[![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)]([https://openreview.net/forum?id=kYkfCs4ZAH](https://github.com/jiaqili3/flexicodec_training_share))
+[![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
 
 
 ## Abstract
