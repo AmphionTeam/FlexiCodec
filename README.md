@@ -3,6 +3,7 @@
 [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2510.00981)
 [![Demo Page](https://img.shields.io/badge/GitHub.io-Demo_Page-blue?logo=Github&style=flat-square)](https://flexicodec.github.io/)
 [![OpenReview](https://img.shields.io/badge/OpenReview-ICLR2026-red?logo=OpenReview&style=flat-square)](https://openreview.net/forum?id=kYkfCs4ZAH)
+[![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)]([https://openreview.net/forum?id=kYkfCs4ZAH](https://github.com/jiaqili3/flexicodec_training_share))
 
 
 ## Abstract
@@ -201,7 +202,7 @@ print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 - You can reuse `model_dict` for multiple inference calls to avoid reloading the model
 - `framerate` controls FlexiCodec's dynamic frame rate: lower values (e.g., 0.87, 0.91) enable merging for lower average frame rates, while 1.0 disables merging (standard 12.5Hz)
 
-### Training reference implementations
+## Training reference implementations
 - For FlexiCodec: see https://github.com/jiaqili3/flexicodec_training_share
 - For FlexiCodec-TTS:
 Inside `flexicodec/ar_tts/modeling_artts.py` and `flexicodec/nar_tts/modeling_voicebox.py` there are `training_forward` methods that receive audios and prepared sensevoice-small input "FBank" features. (`dl_output` dictionary containing `x` (the [`feature_extractor`](flexicodec/infer.py#L50) output), `x_lens` (length of each x before padding), `audio` (the 16khz audio tensor)). 
