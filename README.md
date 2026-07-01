@@ -18,6 +18,11 @@ pip install -r requirements.txt
 ```
 <!-- # pip install -e . -->
 
+## News
+- 2026-07-01: A new paper based on FlexiCodec is released: FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247), applying FlexiCodec to spoken language model, enabling dynamic and controllable frame rate. 
+- 2026-04-26: FlexiCodec is presented in ICLR2026 poster ([picture](https://jiaqili3.github.io/assets/img/iclr2026.jpg))
+- 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
+
 ## FlexiCodec
 To run inference (automatically downloads checkpoint from huggingface):
 ```python
