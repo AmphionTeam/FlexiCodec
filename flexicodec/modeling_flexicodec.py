@@ -6,7 +6,7 @@ from typing import Union
 import torch
 from torch import nn
 from transformers import Wav2Vec2BertModel
-from dac.nn.layers import WNConv1d
+from .dac_layers import WNConv1d
 from .dac_quantize import ResidualVectorQuantize
 from .fsq_wrapper import FSQWrapper
 from easydict import EasyDict as edict
