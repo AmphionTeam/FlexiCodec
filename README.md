@@ -12,24 +12,25 @@ Neural audio codecs are foundational to speech language models. Recent studies h
 In this work, we develop FlexiCodec. FlexiCodec improves semantic preservation with a dynamic frame rate approach and introduces a novel architecture featuring an ASR feature-assisted dual stream encoding and Transformer bottlenecks. With dynamic frame rates, it uses less frames at information-sparse regions through adaptively merging semantically similar frames. A dynamic frame rate also allows FlexiCodec to support inference-time controllable frame rates between 3Hz and 12.5Hz.
 ![](.github/flexicodec.png)
 
-## Installation
-Please install torch and torchaudio in your environment first, and then run:
-```bash
-pip install flexicodec
-```
-
-Alternatively, you can clone the repository and install the package locally:
-```bash
-git clone https://github.com/AmphionTeam/FlexiCodec.git
-cd FlexiCodec
-pip install -r requirements.txt
-```
-<!-- # pip install -e . -->
-
 ## News
 - 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247) [![Code](https://img.shields.io/badge/Github-code_and_data-blue?logo=github&style=flat-square)](https://arxiv.org/abs/2606.31247), applying FlexiCodec to a speech-in-speech-out spoken language model, enabling dynamic and controllable frame rate.
 - 2026-04-26: FlexiCodec is presented in ICLR2026 poster ([picture](https://jiaqili3.github.io/assets/img/iclr2026.jpg))
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
+
+## Installation
+To infer FlexiCodec, you need to install torch and torchaudio in your environment first, and then run:
+```bash
+pip install flexicodec
+```
+
+Alternatively, you can clone the repository and install the dependencies locally:
+```bash
+git clone https://github.com/AmphionTeam/FlexiCodec.git
+cd FlexiCodec
+pip install -e .
+```
+<!-- # pip install -e . -->
+
 
 ## FlexiCodec
 ### Inference code example (automatically downloads checkpoint from huggingface)
@@ -68,8 +69,6 @@ Notes:
 
 - Batched input is supported. You can directly pass audios shaped [B,T] to the script above, but the audio length information will be unavailable.
 To resolve this, you can additionally pass an `audio_lens` parameter to `encode_flexicodec`, and you can crop the output for each audio in `encoded_output[speech_token_len]`. 
-
-- If you want to use the above code elsewhere, you might want to add `sys.path.append('/path/to/FlexiCodec')` to find the code.
 
 
 - To extract continuous features from the semantic tokens, use:
