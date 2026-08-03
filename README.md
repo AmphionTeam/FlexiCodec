@@ -27,7 +27,7 @@ pip install -r requirements.txt
 <!-- # pip install -e . -->
 
 ## News
-- 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247)[![Code](https://img.shields.io/badge/Github-code-blue?logo=github&style=flat-square)](https://arxiv.org/abs/2606.31247), applying FlexiCodec to spoken language model, enabling dynamic and controllable frame rate. Supports speech input and output. 
+- 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247) [![Code](https://img.shields.io/badge/Github-code_and_data-blue?logo=github&style=flat-square)](https://arxiv.org/abs/2606.31247), applying FlexiCodec to a speech-in-speech-out spoken language model, enabling dynamic and controllable frame rate.
 - 2026-04-26: FlexiCodec is presented in ICLR2026 poster ([picture](https://jiaqili3.github.io/assets/img/iclr2026.jpg))
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
 
@@ -36,14 +36,15 @@ pip install -r requirements.txt
 This code automatically downloads checkpoint from huggingface. If you prefer to download the checkpoint manually, there is another example below.
 ```python
 import torch
-import torchaudio
+import soundfile as sf
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model()
-  
+
 # Load a real audio file
-audio_path = "YOUR_WAV.wav"
-audio, sample_rate = torchaudio.load(audio_path)
+audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
+audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
+audio = torch.from_numpy(audio_np.T.copy()) # audio.shape: [1, T]
 with torch.no_grad():
     encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
     
@@ -55,7 +56,7 @@ with torch.no_grad():
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-torchaudio.save(output_path, reconstructed_audio.cpu().squeeze(1), 16000)
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).transpose(0, 1).numpy(), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
@@ -88,14 +89,15 @@ hf download jiaqili3/flexicodec 12hz_v1_half_config.yaml --local-dir ./checkpoin
 Then, you can use the following code to do inference:
 ```python
 import torch
-import torchaudio
+import soundfile as sf
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall', ckpt_path='./checkpoints/flexicodec/12hz_v1_half.safetensors', config_path='./checkpoints/flexicodec/12hz_v1_half_config.yaml')
 
 # Load a real audio file
-audio_path = "YOUR_WAV.wav"
-audio, sample_rate = torchaudio.load(audio_path)
+audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
+audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
+audio = torch.from_numpy(audio_np.T.copy())
 with torch.no_grad():
     encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
     
@@ -107,10 +109,11 @@ with torch.no_grad():
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-torchaudio.save(output_path, reconstructed_audio.cpu().squeeze(1), 16000)
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).transpose(0, 1).numpy(), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
+
 
 ```
 

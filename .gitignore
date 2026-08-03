@@ -1,3 +1,4 @@
+checkpoints/
 dist
 *.whl
 dualcodec_ckpts
