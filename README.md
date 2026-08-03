@@ -20,7 +20,7 @@ pip install flexicodec
 
 Alternatively, you can clone the repository and install the package locally:
 ```bash
-git clone https://github.com/amphionspace/FlexiCodec.git
+git clone https://github.com/AmphionTeam/FlexiCodec.git
 cd FlexiCodec
 pip install -r requirements.txt
 ```
