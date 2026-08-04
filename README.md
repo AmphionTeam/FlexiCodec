@@ -18,12 +18,12 @@ In this work, we develop FlexiCodec. FlexiCodec improves semantic preservation w
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
 
 ## Installation
-To infer FlexiCodec, you need to install torch and torchaudio in your environment first, and then run:
+To infer FlexiCodec, you need to properly install torch and torchaudio in your environment first, and then run:
 ```bash
 pip install flexicodec
 ```
 
-Alternatively, you can clone the repository and install the dependencies locally:
+Alternatively, you can clone the repository and install locally:
 ```bash
 git clone https://github.com/AmphionTeam/FlexiCodec.git
 cd FlexiCodec
@@ -44,27 +44,26 @@ model_dict = prepare_model()
 
 # Load a real audio file
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
-audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
-audio = torch.from_numpy(audio_np.T.copy()) # audio.shape: [1, T]
-with torch.no_grad():
-    encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
+audio, sample_rate = torchaudio.load(audio_path)
+
+encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
     
-    reconstructed_audio = model_dict['model'].decode_from_codes(
-        semantic_codes=encoded_output['semantic_codes'],
-        acoustic_codes=encoded_output['acoustic_codes'],
-        token_lengths=encoded_output['token_lengths'],
-    )
+reconstructed_audio = model_dict['model'].decode_from_codes(
+    semantic_codes=encoded_output['semantic_codes'],
+    acoustic_codes=encoded_output['acoustic_codes'],
+    token_lengths=encoded_output['token_lengths'],
+)
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-sf.write(output_path, reconstructed_audio.cpu().squeeze(1).transpose(0, 1).numpy(), 16000)
+torchaudio.save(output_path, reconstructed_audio.cpu().squeeze(1), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
 ```
 
 Notes:
-- You may tune the `num_quantizers=xxx` (maximum 24), `merging_threshold=xxx` (maximum 1.0) parameters. If you set `merging_threshold=1.0`, it will be a standard 12.5Hz neural audio codec. All of its `token_lengths` items will be 1. 
+- You may tune the `num_quantizers=xxx` (min 1, max 24), `merging_threshold=xxx` (maximum 1.0) parameters. If you set `merging_threshold=1.0`, it will be a standard 12.5Hz neural audio codec. All of its `token_lengths` items will be 1. 
 
 
 - Batched input is supported. You can directly pass audios shaped [B,T] to the script above, but the audio length information will be unavailable.
@@ -75,7 +74,11 @@ To resolve this, you can additionally pass an `audio_lens` parameter to `encode_
   ```python
   feat = model_dict['model'].get_semantic_feature(encoded_output['semantic_codes'])
   ```
-- For mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code.  
+
+
+Troubleshooting:
+- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" when executing the `torchaudio.load`, this is becuase the latest torchaudio uses torchcodec backend, and torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
+- If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
 
 
 ### Inference code example (manually download checkpoint)
@@ -95,25 +98,22 @@ model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall'
 
 # Load a real audio file
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
-audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
-audio = torch.from_numpy(audio_np.T.copy())
-with torch.no_grad():
-    encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
+audio, sample_rate = torchaudio.load(audio_path)
+
+encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
     
-    reconstructed_audio = model_dict['model'].decode_from_codes(
-        semantic_codes=encoded_output['semantic_codes'],
-        acoustic_codes=encoded_output['acoustic_codes'],
-        token_lengths=encoded_output['token_lengths'],
-    )
+reconstructed_audio = model_dict['model'].decode_from_codes(
+    semantic_codes=encoded_output['semantic_codes'],
+    acoustic_codes=encoded_output['acoustic_codes'],
+    token_lengths=encoded_output['token_lengths'],
+)
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-sf.write(output_path, reconstructed_audio.cpu().squeeze(1).transpose(0, 1).numpy(), 16000)
+torchaudio.save(output_path, reconstructed_audio.cpu().squeeze(1), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
-
-
 ```
 
 ## FlexiCodec-TTS
