@@ -268,11 +268,11 @@ If you need more code for training FlexiCodec-TTS, you can contact me or create 
 
 If you find our works useful, please consider citing as:
 ```biblatex
-@inproceedings{li2026flexicodec,
+@article{li2025flexicodec,
   title={FlexiCodec: A Dynamic Neural Audio Codec for Low Frame Rates},
-  author={Jiaqi Li and Yao Qian and Yuxuan Hu and leying zhang and Xiaofei Wang and Heng Lu and Manthan Thakker and Jinyu Li and sheng zhao and Zhizheng Wu},
-  booktitle={The Fourteenth International Conference on Learning Representations},
-  year={2026},
+  author={Li, Jiaqi and Qian, Yao and Hu, Yuxuan and Zhang, Leying and Wang, Xiaofei and Lu, Heng and Thakker, Manthan and Li, Jinyu and Zhao, Shang and Wu, Zhizheng},
+  journal={arXiv preprint arXiv:2510.00981},
+  year={2025}
 }
 
 @article{li2025dualcodec,
