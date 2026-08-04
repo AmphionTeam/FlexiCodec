@@ -520,7 +520,7 @@ class FlexiCodec(nn.Module):
         audio_output = self.dac.decoder(acoustic_final)
         return audio_output
     
-    def forward(self, dl_output, encode_only=False, infer_using_dynamic_threshold=False):
+    def forward(self, dl_output, encode_only=False, infer_using_dynamic_threshold=False, return_semantic_feature=False):
         audio_data = dl_output.get("audio", dl_output).float()
         if len(audio_data.shape) == 2:
             audio_data = audio_data.unsqueeze(1) # [B, 1, T]
@@ -542,6 +542,10 @@ class FlexiCodec(nn.Module):
         )
         semantic_repr = semantic_repr.transpose(1,2)
         sim_repr = sim_repr.transpose(1,2)
+        
+        if return_semantic_feature:
+            return semantic_repr
+
         out_dict = self.forward_features(
             audio_data,
             self.sample_rate,
