@@ -33,7 +33,7 @@ pip install -e .
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
 
 ## FlexiCodec
-### Inference code example (automatically downloads checkpoint from huggingface)
+### Inference example (automatically downloads checkpoint from huggingface)
 This code automatically downloads checkpoint from huggingface. If you prefer to download the checkpoint manually, there is another example below.
 ```python
 import torch
@@ -81,7 +81,7 @@ Troubleshooting:
 - If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
 
 
-### Inference code example (manually download checkpoint)
+### Inference example (manually download checkpoint)
 Run the following commands to download the checkpoint manually:
 ```bash
 hf download FunAudioLLM/SenseVoiceSmall --local-dir ./checkpoints/SenseVoiceSmall
