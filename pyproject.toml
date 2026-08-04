@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flexicodec"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Dynamic Neural Audio Codec for Low Frame Rates"
 readme = "README.md"
 license = "MIT"
@@ -17,10 +17,8 @@ dependencies = [
     "easydict",
     "torch",
     "torchaudio",
-    "hydra-core",
     "einops",
     "safetensors",
-    "cached_path",
     "funasr",
 ]
 
