@@ -1,6 +1,6 @@
 funasr
 easydict
-descript-audio-codec
+descript-audiotools>=0.7.2
 pyyaml
 huggingface_hub
 transformers
