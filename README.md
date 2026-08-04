@@ -37,7 +37,7 @@ pip install -e .
 This code automatically downloads checkpoint from huggingface. If you prefer to download the checkpoint manually, there is another example below.
 ```python
 import torch
-import soundfile as sf
+import torchaudio
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model()
@@ -91,7 +91,7 @@ hf download jiaqili3/flexicodec 12hz_v1_half_config.yaml --local-dir ./checkpoin
 Then, you can use the following code to do inference:
 ```python
 import torch
-import soundfile as sf
+import torchaudio
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall', ckpt_path='./checkpoints/flexicodec/12hz_v1_half.safetensors', config_path='./checkpoints/flexicodec/12hz_v1_half_config.yaml')
