@@ -12,34 +12,47 @@ Neural audio codecs are foundational to speech language models. Recent studies h
 In this work, we develop FlexiCodec. FlexiCodec improves semantic preservation with a dynamic frame rate approach and introduces a novel architecture featuring an ASR feature-assisted dual stream encoding and Transformer bottlenecks. With dynamic frame rates, it uses less frames at information-sparse regions through adaptively merging semantically similar frames. A dynamic frame rate also allows FlexiCodec to support inference-time controllable frame rates between 3Hz and 12.5Hz.
 ![](.github/flexicodec.png)
 
+
 ## Installation
+To install FlexiCodec for inference, you need to properly install torch and torchaudio in your environment first, and then run:
 ```bash
-git clone https://github.com/amphionspace/FlexiCodec.git
+pip install flexicodec
+```
+
+Alternatively, you can clone the repository and install locally:
+```bash
+git clone https://github.com/AmphionTeam/FlexiCodec.git
 cd FlexiCodec
-pip install -r requirements.txt
+pip install -e .
 ```
 <!-- # pip install -e . -->
 
 ## News
-- 2026-07-01: A new paper based on FlexiCodec is released: FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247), applying FlexiCodec to spoken language model, enabling dynamic and controllable frame rate. 
+- 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247) [![Code](https://img.shields.io/badge/Github-code-blue?logo=github&style=flat-square)](https://arxiv.org/abs/2606.31247) [![data](https://img.shields.io/badge/Data-2M_speech2speech-yellow?logo=huggingface&logoColor=white)](https://huggingface.co/datasets/FlexiSLM/FlexiSLM-Data-2M-s2s-compact)
+, applying FlexiCodec to a speech-in-speech-out spoken language model, enabling dynamic and controllable frame rate.
 - 2026-04-26: FlexiCodec is presented in ICLR2026 poster ([picture](https://jiaqili3.github.io/assets/img/iclr2026.jpg))
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
 
 ## FlexiCodec
-To run inference (automatically downloads checkpoint from huggingface):
+### Inference example (automatically downloads checkpoint from huggingface)
+This code automatically downloads checkpoint from huggingface. If you prefer to download the checkpoint manually, there is another example below.
 ```python
 import torch
 import torchaudio
+import soundfile as sf
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model()
-  
+
 # Load a real audio file
-audio_path = "YOUR_WAV.wav"
-audio, sample_rate = torchaudio.load(audio_path)
+audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
+audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
+audio = torch.from_numpy(audio_np.T)
+# If this doesn't work, use `audio, sample_rate = torchaudio.load(audio_path)`
+
 with torch.no_grad():
     encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
-    
+        
     reconstructed_audio = model_dict['model'].decode_from_codes(
         semantic_codes=encoded_output['semantic_codes'],
         acoustic_codes=encoded_output['acoustic_codes'],
@@ -48,29 +61,69 @@ with torch.no_grad():
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-torchaudio.save(output_path, reconstructed_audio.cpu().squeeze(1), 16000)
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).T.numpy(), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
 ```
 
 Notes:
-- You may tune the `num_quantizers=xxx` (maximum 24), `merging_threshold=xxx` (maximum 1.0) parameters. If you set `merging_threshold=1.0`, it will be a standard 12.5Hz neural audio codec. All of its `token_lengths` items will be 1. 
-
-- For mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. If you don't want to automatically download from huggingface, you can manually specify your downloaded checkpoint paths [![Huggingface](https://img.shields.io/badge/huggingface-yellow?logo=huggingface&style=flat-square)](https://huggingface.co/jiaqili3/flexicodec/tree/main) in `prepare_model`. 
+- You may tune the `num_quantizers=xxx` (min 1, max 24), `merging_threshold=xxx` (maximum 1.0) parameters. If you set `merging_threshold=1.0`, it will be a standard 12.5Hz neural audio codec. All of its `token_lengths` items will be 1. 
 
 
 - Batched input is supported. You can directly pass audios shaped [B,T] to the script above, but the audio length information will be unavailable.
 To resolve this, you can additionally pass an `audio_lens` parameter to `encode_flexicodec`, and you can crop the output for each audio in `encoded_output[speech_token_len]`. 
 
-- If you want to use the above code elsewhere, you might want to add `sys.path.append('/path/to/FlexiCodec')` to find the code.
 
 - To extract continuous features from the semantic tokens, use:
   ```python
   feat = model_dict['model'].get_semantic_feature(encoded_output['semantic_codes'])
   ```
 
-- Model source code is available at [`flexicodec/modeling_flexicodec.py`](flexicodec/modeling_flexicodec.py). 
+
+**Troubleshooting**:
+- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" or "TorchCodec is required for load_with_torchcodec. Please install torchcodec to use this function.", this is becuase the latest torchaudio uses torchcodec backend, and torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
+- If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
+
+
+### Alternative inference example (manually download checkpoint)
+Run the following commands to download the checkpoint manually:
+```bash
+hf download FunAudioLLM/SenseVoiceSmall --local-dir ./checkpoints/SenseVoiceSmall
+hf download jiaqili3/flexicodec 12hz_v1_half.safetensors --local-dir ./checkpoints/flexicodec
+hf download jiaqili3/flexicodec 12hz_v1_half_config.yaml --local-dir ./checkpoints/flexicodec
+```
+Then, you can use the following code to do inference:
+```python
+import torch
+import torchaudio
+import soundfile as sf
+from flexicodec.infer import prepare_model, encode_flexicodec
+
+model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall', ckpt_path='./checkpoints/flexicodec/12hz_v1_half.safetensors', config_path='./checkpoints/flexicodec/12hz_v1_half_config.yaml')
+
+# Load a real audio file
+audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
+audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
+audio = torch.from_numpy(audio_np.T)
+# If this doesn't work, use `audio, sample_rate = torchaudio.load(audio_path)`
+
+with torch.no_grad():
+    encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
+        
+    reconstructed_audio = model_dict['model'].decode_from_codes(
+        semantic_codes=encoded_output['semantic_codes'],
+        acoustic_codes=encoded_output['acoustic_codes'],
+        token_lengths=encoded_output['token_lengths'],
+    )
+
+duration = audio.shape[-1] / sample_rate
+output_path = 'decoded_audio.wav'
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).T.numpy(), 16000)
+
+print(f"Saved decoded audio to {output_path}")
+print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
+```
 
 ## FlexiCodec-TTS
 First, install additional dependencies:
@@ -200,6 +253,7 @@ print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 ```
 
 **Notes:**
+- The FlexiCodec checkpoint used in our FlexiCodec-TTS and VoiceBox is an older FlexiCodec checkpoint (https://huggingface.co/jiaqili3/flexicodec/blob/main/nartts_flexicodec_only.safetensors). FlexiSLM uses this `nartts_flexicodec_only.safetensors` so that it can reuse the released Voicebox model.
 - The model automatically detects and uses CUDA, MPS (Apple Silicon), or CPU devices
 - `audio_tokens` are semantic token indices extracted from ground truth audio via FlexiCodec encoding (as shown above) or generated by an AR model
 - `length_ids` are duration classes for each token extracted from FlexiCodec encoding (optional, defaults to 1 for each token)

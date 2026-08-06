@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flexicodec"
+version = "0.1.1"
+description = "A Dynamic Neural Audio Codec for Low Frame Rates"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+
+dependencies = [
+    "transformers",
+    "descript-audiotools",
+    "huggingface_hub",
+    "easydict",
+    "torch",
+    "torchaudio",
+    "soundfile",
+    "einops",
+    "safetensors",
+    "funasr",
+]
+
+[project.optional-dependencies]
+tts = [
+    "cached-path",
+    "phonemizer",
+    "openai-whisper",
+    "f5_tts",
+    "accelerate>=1.0",
+    "datasets",
+    "openai-whisper",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["flexicodec*"]
+
+[tool.setuptools.package-data]
+flexicodec = [
+    "am.mvn",
+    "conf/*.yaml",
+]

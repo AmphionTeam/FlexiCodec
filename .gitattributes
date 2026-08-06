@@ -1,2 +1,0 @@
-*.wav filter=lfs diff=lfs merge=lfs -text
-dualcodec.png filter=lfs diff=lfs merge=lfs -text

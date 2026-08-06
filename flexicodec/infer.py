@@ -52,11 +52,14 @@ def prepare_model(sensevoice_small_path=None, device='auto', ckpt_path=None, con
     return {"model": model, "feature_extractor": feature_extractor, "type": "sensevoice"}
 
 @torch.no_grad()
-def encode_flexicodec(audio: torch.Tensor, model: dict, sample_rate: int=16000, num_quantizers: int = 8, merging_threshold: float = 0.91, audio_lens=None):
+def encode_flexicodec(audio: torch.Tensor, model: dict, sample_rate: int=16000, num_quantizers: int = 8, merging_threshold: float = 0.91, audio_lens=None, \
+    audio_features=None, audio_features_lens=None, return_semantic_feature=False):
     """
     Encodes the audio using the FlexiCodec model.
     Audio: [B,T]
     audio_lens: [B]
+    audio_features: Optional. Extracted features from sensevoice. shape = [B, max_T, D]
+    audio_features_lens: Expected if audio_features is not None. shape = [B]. Contains length of original features before padding.
     """
     assert len(audio.shape) == 2, "audio should be [B, T]"
     batch_size = audio.shape[0]
@@ -72,25 +75,30 @@ def encode_flexicodec(audio: torch.Tensor, model: dict, sample_rate: int=16000, 
     audio_16k = resampler_16k(audio)
     duration = audio_16k.shape[-1] / 16000
     sim = None
-    # Process each batch item individually and concatenate features
-    features_list = []
-    for i in range(audio_16k.shape[0]):
-        if audio_lens is not None:
-            features_i, _ = feature_extractor.extract_fbank(audio_16k[i:i+1,:audio_lens[i]].cpu())
-        else:
-            features_i, _ = feature_extractor.extract_fbank(audio_16k[i:i+1].cpu())
-        features_list.append(features_i.squeeze(0))
-    features_lens = torch.tensor([features_i.shape[0] for features_i in features_list])
-    features_lens = features_lens.to(device)
-    features = torch.nn.utils.rnn.pad_sequence(features_list, batch_first=True)
-        # Now features.shape = [B, max_T, D]
-    audio_features = features.to(device)
+    if audio_features is None:
+        # Process each batch item individually and concatenate features
+        features_list = []
+        for i in range(audio_16k.shape[0]):
+            if audio_lens is not None:
+                features_i, _ = feature_extractor.extract_fbank(audio_16k[i:i+1,:audio_lens[i]].cpu())
+            else:
+                features_i, _ = feature_extractor.extract_fbank(audio_16k[i:i+1].cpu())
+            features_list.append(features_i.squeeze(0))
+        audio_features_lens = torch.tensor([features_i.shape[0] for features_i in features_list])
+        audio_features = torch.nn.utils.rnn.pad_sequence(features_list, batch_first=True)
+        # Now audio_features.shape = [B, max_T, D]
+    else:
+        if len(audio_features.shape) == 2:
+            audio_features = audio_features.unsqueeze(0)
+        assert audio_features_lens is not None, "audio_features_lens shoud be given if you manually specify `audio_features`."
+    audio_features = audio_features.to(device)
+    audio_features_lens = audio_features_lens.to(device)
 
 
     dl_output = {
         "audio": audio_16k,
         "x": audio_features,
-        'x_lens': features_lens,
+        'x_lens': audio_features_lens,
         "num_quantizers": num_quantizers,
         "manual_threshold": merging_threshold,
     }
@@ -98,7 +106,11 @@ def encode_flexicodec(audio: torch.Tensor, model: dict, sample_rate: int=16000, 
     encoded_output = codec_model(
         dl_output,
         encode_only=True,
+        return_semantic_feature=return_semantic_feature
     )
+    if return_semantic_feature:
+        return encoded_output
+
     # Extract the codes and token lengths
     semantic_codes = encoded_output['semantic_codes']
     acoustic_codes = encoded_output['acoustic_codes']
