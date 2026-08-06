@@ -82,7 +82,7 @@ Troubleshooting:
 - If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
 
 
-### Inference example (manually download checkpoint)
+### Alternative inference example (manually download checkpoint)
 Run the following commands to download the checkpoint manually:
 ```bash
 hf download FunAudioLLM/SenseVoiceSmall --local-dir ./checkpoints/SenseVoiceSmall
