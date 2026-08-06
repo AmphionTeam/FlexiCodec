@@ -14,7 +14,7 @@ In this work, we develop FlexiCodec. FlexiCodec improves semantic preservation w
 
 
 ## Installation
-To infer FlexiCodec, you need to properly install torch and torchaudio in your environment first, and then run:
+To install FlexiCodec for inference, you need to properly install torch and torchaudio in your environment first, and then run:
 ```bash
 pip install flexicodec
 ```
@@ -47,13 +47,14 @@ model_dict = prepare_model()
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
 audio, sample_rate = torchaudio.load(audio_path)
 
-encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
-    
-reconstructed_audio = model_dict['model'].decode_from_codes(
-    semantic_codes=encoded_output['semantic_codes'],
-    acoustic_codes=encoded_output['acoustic_codes'],
-    token_lengths=encoded_output['token_lengths'],
-)
+with torch.no_grad():
+    encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
+        
+    reconstructed_audio = model_dict['model'].decode_from_codes(
+        semantic_codes=encoded_output['semantic_codes'],
+        acoustic_codes=encoded_output['acoustic_codes'],
+        token_lengths=encoded_output['token_lengths'],
+    )
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
@@ -101,13 +102,14 @@ model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall'
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
 audio, sample_rate = torchaudio.load(audio_path)
 
-encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
-    
-reconstructed_audio = model_dict['model'].decode_from_codes(
-    semantic_codes=encoded_output['semantic_codes'],
-    acoustic_codes=encoded_output['acoustic_codes'],
-    token_lengths=encoded_output['token_lengths'],
-)
+with torch.no_grad():
+    encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
+        
+    reconstructed_audio = model_dict['model'].decode_from_codes(
+        semantic_codes=encoded_output['semantic_codes'],
+        acoustic_codes=encoded_output['acoustic_codes'],
+        token_lengths=encoded_output['token_lengths'],
+    )
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
