@@ -39,6 +39,7 @@ This code automatically downloads checkpoint from huggingface. If you prefer to 
 ```python
 import torch
 import torchaudio
+import soundfile as sf
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model()
@@ -47,6 +48,7 @@ model_dict = prepare_model()
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
 audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
 audio = torch.from_numpy(audio_np.T)
+# If this doesn't work, use `audio, sample_rate = torchaudio.load(audio_path)`
 
 with torch.no_grad():
     encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
@@ -59,7 +61,7 @@ with torch.no_grad():
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-sf.write(output_path, reconstructed_audio.detach().cpu().squeeze(1).T.numpy(), 16000)
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).T.numpy(), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
@@ -95,6 +97,7 @@ Then, you can use the following code to do inference:
 ```python
 import torch
 import torchaudio
+import soundfile as sf
 from flexicodec.infer import prepare_model, encode_flexicodec
 
 model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall', ckpt_path='./checkpoints/flexicodec/12hz_v1_half.safetensors', config_path='./checkpoints/flexicodec/12hz_v1_half_config.yaml')
@@ -103,6 +106,7 @@ model_dict = prepare_model(sensevoice_small_path='./checkpoints/SenseVoiceSmall'
 audio_path = "./audio_examples/audio1.wav" # or replace with your own audio file
 audio_np, sample_rate = sf.read(audio_path, dtype="float32", always_2d=True)
 audio = torch.from_numpy(audio_np.T)
+# If this doesn't work, use `audio, sample_rate = torchaudio.load(audio_path)`
 
 with torch.no_grad():
     encoded_output = encode_flexicodec(audio, model_dict, sample_rate, num_quantizers=8, merging_threshold=0.91)
@@ -115,7 +119,7 @@ with torch.no_grad():
 
 duration = audio.shape[-1] / sample_rate
 output_path = 'decoded_audio.wav'
-sf.write(output_path, reconstructed_audio.detach().cpu().squeeze(1).T.numpy(), 16000)
+sf.write(output_path, reconstructed_audio.cpu().squeeze(1).T.numpy(), 16000)
 
 print(f"Saved decoded audio to {output_path}")
 print(f"This sample avg frame rate: {encoded_output['token_lengths'].shape[-1] / duration:.4f} frames/sec")
