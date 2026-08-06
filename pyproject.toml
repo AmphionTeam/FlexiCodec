@@ -11,8 +11,8 @@ license = "MIT"
 license-files = ["LICENSE"]
 
 dependencies = [
-    "transformers>=4.30.0",
-    "descript-audiotools>=0.7.2",
+    "transformers",
+    "descript-audiotools",
     "huggingface_hub[cli]",
     "easydict",
     "torch",

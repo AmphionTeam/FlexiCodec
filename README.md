@@ -77,8 +77,8 @@ To resolve this, you can additionally pass an `audio_lens` parameter to `encode_
   ```
 
 
-Troubleshooting:
-- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" when executing the `torchaudio.load`, this is becuase the latest torchaudio uses torchcodec backend, and torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
+**Troubleshooting**:
+- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" or "TorchCodec is required for load_with_torchcodec. Please install torchcodec to use this function.", this is becuase the latest torchaudio uses torchcodec backend, and torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
 - If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
 
 
