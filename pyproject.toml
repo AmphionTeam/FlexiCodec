@@ -13,10 +13,11 @@ license-files = ["LICENSE"]
 dependencies = [
     "transformers",
     "descript-audiotools",
-    "huggingface_hub[cli]",
+    "huggingface_hub",
     "easydict",
     "torch",
     "torchaudio",
+    "soundfile",
     "einops",
     "safetensors",
     "funasr",
