@@ -28,7 +28,7 @@ pip install -e .
 <!-- # pip install -e . -->
 
 ## News
-- 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247) [![Code](https://img.shields.io/badge/Github-code-blue?logo=github&style=flat-square)](https://arxiv.org/abs/2606.31247) [![data](https://img.shields.io/badge/Data-2M_speech2speech-yellow?logo=huggingface&logoColor=white)](https://huggingface.co/datasets/FlexiSLM/FlexiSLM-Data-2M-s2s-compact)
+- 2026-07-01: We release FlexiSLM [![ArXiv](https://img.shields.io/badge/arXiv-PDF-green?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2606.31247) [![Code](https://img.shields.io/badge/Github-code-blue?logo=github&style=flat-square)](https://github.com/AmphionTeam/FlexiSLM) [![data](https://img.shields.io/badge/Data-2M_speech2speech-yellow?logo=huggingface&logoColor=white)](https://huggingface.co/datasets/FlexiSLM/FlexiSLM-Data-2M-s2s-compact)
 , applying FlexiCodec to a speech-in-speech-out spoken language model, enabling dynamic and controllable frame rate.
 - 2026-04-26: FlexiCodec is presented in ICLR2026 poster ([picture](https://jiaqili3.github.io/assets/img/iclr2026.jpg))
 - 2026-03-21: We release the training code of FlexiCodec in a separate repo [![Training Code](https://img.shields.io/badge/GitHub-Training_Code-black?logo=Github&style=flat-square)](https://github.com/jiaqili3/flexicodec_training_share)
@@ -82,7 +82,6 @@ To resolve this, you can additionally pass an `audio_lens` parameter to `encode_
 
 
 **Troubleshooting**:
-- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" or "TorchCodec is required for load_with_torchcodec. Please install torchcodec to use this function.", this is becuase the latest torchaudio uses torchcodec backend, and torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
 - If you have huggingface connection issue, for mainland China users, you might need to execute `export HF_ENDPOINT=https://hf-mirror.com` in terminal, before running the code. 
 
 
@@ -183,7 +182,12 @@ print(f"Saved output to {output_path}")
 print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 ```
 
+**Troubleshooting**:
+- If you see error messages like "RuntimeError: Could not Load Libtorchcodec" or "TorchCodec is required for load_with_torchcodec. Please install torchcodec to use this function.", this means torchcodec is not installed properly. You can either (1) install the torchcodec compatible with your PyTorch by following [link](https://github.com/meta-pytorch/torchcodec#compatibility-with-torch-versions), and make sure you have `ffmpeg` installed (e.g., `apt install ffmpeg`), or (2) use `soundfile` package to load and save audio.
+
+
 **Notes:**
+- The FlexiCodec checkpoint used in our FlexiCodec-TTS and VoiceBox is an older FlexiCodec checkpoint (https://huggingface.co/jiaqili3/flexicodec/blob/main/nartts_flexicodec_only.safetensors). FlexiSLM uses this `nartts_flexicodec_only.safetensors` so that it can reuse this released Voicebox model and checkpoint.
 - `tts_synthesize` performs the full pipeline: AR generation + NAR decoding to audio
 - The function returns a tuple: `(output_audio, sample_rate, duration_classes)`
 - `duration_classes` contains the token durations which can be used to calculate the average frame rate
@@ -191,6 +195,7 @@ print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 - Reference text (`ref_text`) is optional and can help with prosody alignment
 - Set `use_nar=False` in `tts_synthesize` to use AR-only decoding (faster but lower quality)
 - `merging_threshold` controls the frame rate: 0.91 gives ~8.3Hz, 0.86 gives ~6.25Hz
+
 ### FlexiCodec-based Voicebox NAR Inference
 The VoiceBox NAR system can decode FlexiCodec's RVQ-1 tokens into speech. It is used as the second stage in FlexiCodec-TTS, but can also be used standalone.
 To run NAR TTS inference using FlexiCodec-Voicebox:
@@ -253,7 +258,7 @@ print(f"This sample avg frame rate: {avg_frame_rate:.4f} frames/sec")
 ```
 
 **Notes:**
-- The FlexiCodec checkpoint used in our FlexiCodec-TTS and VoiceBox is an older FlexiCodec checkpoint (https://huggingface.co/jiaqili3/flexicodec/blob/main/nartts_flexicodec_only.safetensors). FlexiSLM uses this `nartts_flexicodec_only.safetensors` so that it can reuse the released Voicebox model.
+- The FlexiCodec checkpoint used in our FlexiCodec-TTS and VoiceBox is an older FlexiCodec checkpoint (https://huggingface.co/jiaqili3/flexicodec/blob/main/nartts_flexicodec_only.safetensors). FlexiSLM uses this `nartts_flexicodec_only.safetensors` so that it can reuse this released Voicebox model.
 - The model automatically detects and uses CUDA, MPS (Apple Silicon), or CPU devices
 - `audio_tokens` are semantic token indices extracted from ground truth audio via FlexiCodec encoding (as shown above) or generated by an AR model
 - `length_ids` are duration classes for each token extracted from FlexiCodec encoding (optional, defaults to 1 for each token)
