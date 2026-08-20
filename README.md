@@ -285,7 +285,7 @@ If you find our works useful, please consider citing as:
 ```biblatex
 @article{li2025flexicodec,
   title={FlexiCodec: A Dynamic Neural Audio Codec for Low Frame Rates},
-  author={Li, Jiaqi and Qian, Yao and Hu, Yuxuan and Zhang, Leying and Wang, Xiaofei and Lu, Heng and Thakker, Manthan and Li, Jinyu and Zhao, Shang and Wu, Zhizheng},
+  author={Li, Jiaqi and Qian, Yao and Hu, Yuxuan and Zhang, Leying and Wang, Xiaofei and Lu, Heng and Thakker, Manthan and Li, Jinyu and Zhao, Sheng and Wu, Zhizheng},
   journal={arXiv preprint arXiv:2510.00981},
   year={2025}
 }
