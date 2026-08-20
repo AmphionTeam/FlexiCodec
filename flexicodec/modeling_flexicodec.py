@@ -223,7 +223,8 @@ class FlexiCodec(nn.Module):
                 trust_remote_code=True,
                 remote_code=sensevoice_model_code_dir,
                 device="cpu",
-                disable_update=True
+                disable_update=True,
+                install_model_requirements=False,
             )
             # Set semantic_model to the model directly, similar to audio_encoder.py
             self.semantic_model = funasr_model.model
